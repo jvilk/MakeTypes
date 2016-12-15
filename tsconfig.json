@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "es5",
+        "noImplicitAny": true,
+        "noUnusedLocals": true,
+        "noEmitOnError": true,
+        "moduleResolution": "node",
+        "alwaysStrict": true,
+        "inlineSourceMap": true,
+        "strictNullChecks": true,
+        "lib": [
+            "es6", "es2015.collection"
+        ]
+    }
+}

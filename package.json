@@ -1,0 +1,33 @@
+{
+  "name": "maketypes",
+  "version": "1.0.0",
+  "description": "Make TypeScript types from example JSON objects",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jvilk/MakeTypes.git"
+  },
+  "keywords": [
+    "TypeScript",
+    "types",
+    "JSON",
+    "synthesis"
+  ],
+  "author": "John Vilk <jvilk@cs.umass.edu>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jvilk/MakeTypes/issues"
+  },
+  "homepage": "https://github.com/jvilk/MakeTypes#readme",
+  "devDependencies": {
+    "@types/node": "0.0.2",
+    "@types/yargs": "^6.3.3",
+    "typescript": "^2.1.4"
+  },
+  "dependencies": {
+    "yargs": "^6.5.0"
+  }
+}
