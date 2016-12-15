@@ -12,5 +12,9 @@
         "lib": [
             "es6", "es2015.collection"
         ]
-    }
+    },
+    "include": [
+        "index.ts",
+        "lib/**/*.ts"
+    ]
 }

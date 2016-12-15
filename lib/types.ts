@@ -37,7 +37,7 @@ function emitProxyHelpers(e: Emitter): void {
   w.tab(1).writeln(`throw new TypeError("Cannot assign array to type " + c);`);
   w.writeln(`}`);
   w.writeln(`function checkArray(d: any): void {`)
-  w.tab(1).writeln(`if (typeof(d) !== 'string' && (d !== null || d !== undefined)) {`);
+  w.tab(1).writeln(`if (!Array.isArray(d) && (d !== null || d !== undefined)) {`);
   w.tab(2).writeln(`throw new Error('Expected an array or null.');`);
   w.tab(1).writeln(`}`);
   w.writeln(`}`);
