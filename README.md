@@ -6,6 +6,8 @@
 With MakeTypes, you can interact with REST endpoints and other sources of JSON with confidence that
 your program receives the data you expect. **All you need is a file containing representative sample JSON objects.**
 
+[Try the web demo](http://jvilk.com/MakeTypes/)!
+
 Features:
 
 * **Type-checked JSON.parse.** Proxy classes generated with MakeTypes will parse your JSON and check that it matches the expected type during runtime.
