@@ -11,7 +11,8 @@
         "strictNullChecks": true,
         "lib": [
             "es6", "es2015.collection"
-        ]
+        ],
+        "declaration": true
     },
     "include": [
         "index.ts",

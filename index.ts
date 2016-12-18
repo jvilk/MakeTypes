@@ -3,10 +3,7 @@ import * as yargs from 'yargs';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import StreamWriter from './lib/stream_writer';
-import NopWriter from './lib/nop_writer';
-import {Emitter} from './lib/types';
-
+import {StreamWriter, NopWriter, Emitter} from './lib/index';
 
 const argv = yargs.usage('Usage: $0 [options] inputFile rootName')
   .alias('i', 'interface-file')

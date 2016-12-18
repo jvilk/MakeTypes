@@ -11,6 +11,10 @@ All you need is a file containing sample JSON objects.
 
     npm i -g maketypes
 
+## Build
+
+    npm install
+
 ## Usage
 
 First, write a file called `samples.json` that contains JSON samples for a particular object type, such as the value returned from a web service. It can either contain a single sample or an array of samples.

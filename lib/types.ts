@@ -1,6 +1,6 @@
 import Writer from './writer';
 
-const enum BaseShape {
+export const enum BaseShape {
   BOTTOM,
   NULL,
   RECORD,
@@ -13,7 +13,7 @@ const enum BaseShape {
 
 export type Shape = CBottomShape | CNullShape | CRecordShape | CStringShape | CBooleanShape | CNumberShape | CCollectionShape | CAnyShape;
 
-const enum ContextType {
+export const enum ContextType {
   ENTITY,
   FIELD
 }
@@ -104,7 +104,7 @@ function emitProxyTypeCheck(e: Emitter, w: Writer, t: Shape, tabLevel: number, d
   }
 }
 
-class FieldContext {
+export class FieldContext {
   public get type(): ContextType.FIELD {
     return ContextType.FIELD;
   }
@@ -120,7 +120,7 @@ class FieldContext {
   }
 }
 
-class EntityContext {
+export class EntityContext {
   public get type(): ContextType.ENTITY {
     return ContextType.ENTITY;
   }
@@ -135,7 +135,7 @@ class EntityContext {
 
 export type Context = FieldContext | EntityContext;
 
-class CBottomShape {
+export class CBottomShape {
   public get type(): BaseShape.BOTTOM {
     return BaseShape.BOTTOM;
   }
@@ -161,7 +161,7 @@ class CBottomShape {
 
 export const BottomShape = new CBottomShape();
 
-class CNullShape {
+export class CNullShape {
   public get nullable(): boolean {
     return true;
   }
@@ -187,7 +187,7 @@ class CNullShape {
 
 export const NullShape = new CNullShape();
 
-class CNumberShape {
+export class CNumberShape {
   public get nullable(): boolean {
     return this === NullableNumberShape;
   }
@@ -218,7 +218,7 @@ class CNumberShape {
 export const NumberShape = new CNumberShape();
 export const NullableNumberShape = new CNumberShape();
 
-class CStringShape {
+export class CStringShape {
   public get type(): BaseShape.STRING {
     return BaseShape.STRING;
   }
@@ -249,7 +249,7 @@ class CStringShape {
 export const StringShape = new CStringShape();
 export const NullableStringShape = new CStringShape();
 
-class CBooleanShape {
+export class CBooleanShape {
   public get type(): BaseShape.BOOLEAN {
     return BaseShape.BOOLEAN;
   }
