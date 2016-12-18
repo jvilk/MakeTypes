@@ -1,5 +1,6 @@
 import * as CodeMirror from 'codemirror';
 import {Emitter, CbWriter} from 'maketypes';
+import {saveAs} from 'file-saver';
 require('codemirror/mode/javascript/javascript');
 
 function createDiagnosticError(cm: CodeMirror.Editor, pos: {row: number, col: number} | number, msg: string): void {
@@ -29,8 +30,24 @@ function clearErrorGutter(cm: CodeMirror.Editor) {
   cm.clearGutter("error-gutter");
 }
 
+function saveToFile(cm: CodeMirror.Editor, filename: string) {
+  const txt = cm.getValue();
+  const blob = new Blob([txt], {type: "text/plain;charset=utf-8"});
+  saveAs(blob, filename);
+}
+
 const generateBtn = document.getElementById('generate-btn') as HTMLButtonElement;
 const nameInput = document.getElementById('type-name') as HTMLInputElement;
+const saveInterfaceBtn = document.getElementById('save-interface-btn') as HTMLButtonElement;
+const saveProxyBtn = document.getElementById('save-proxy-btn') as HTMLButtonElement;
+
+function getRootName(): string {
+  const val = nameInput.value.replace(/ /g, "");
+  if (val.length > 0) {
+    return val;
+  }
+  return "Root";
+}
 
 const jsonEditor = CodeMirror.fromTextArea(document.getElementById('json-examples') as HTMLTextAreaElement, {
   lineNumbers: true,
@@ -53,6 +70,14 @@ const tsProxy = CodeMirror.fromTextArea(document.getElementById('ts-proxies') as
   mode: "text/typescript",
   readOnly: 'nocursor',
   viewportMargin: 10
+});
+
+saveInterfaceBtn.addEventListener('click', () => {
+  saveToFile(tsInterface, `${getRootName()}.d.ts`);
+});
+
+saveProxyBtn.addEventListener('click', () => {
+  saveToFile(tsProxy, `${getRootName()}.ts`);
 });
 
 generateBtn.addEventListener('click', () => {
@@ -105,11 +130,7 @@ generateBtn.addEventListener('click', () => {
   }, () => {});
   const emitter = new Emitter(ifaceWriter, proxyWriter);
   try {
-    let typeName = nameInput.value.replace(/ /g, "");
-    if (typeName.length === 0) {
-      typeName = "Root";
-    }
-    emitter.emit(jsonObj, typeName);
+    emitter.emit(jsonObj, getRootName());
   } catch (e) {
     createDiagnosticError(jsonEditor, 0, "" + e);
     return;
