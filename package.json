@@ -1,14 +1,18 @@
 {
-  "name": "maketypes",
+  "name": "maketypes-demo",
   "version": "1.0.0",
-  "description": "Make TypeScript types and proxy objects from example JSON objects. Can use proxy objects to dynamically type check JSON at runtime.",
+  "description": "Demo of MakeTypes",
   "main": "index.js",
   "scripts": {
-    "prepublish": "tsc",
+    "prepublish": "npm-run-all --serial build:tsc build:webpack",
+    "build:tsc": "tsc",
+    "build:webpack": "webpack -p",
+    "watch": "npm-run-all --serial prepublish --parallel tsc-watch webpack-watch",
+    "tsc-watch": "tsc -w",
+    "webpack-watch": "webpack --watch",
+    "webpack-server": "webpack-dev-server",
+    "start": "npm-run-all --serial prepublish --parallel tsc-watch webpack-server",
     "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "bin": {
-    "make_types": "./index.js"
   },
   "repository": {
     "type": "git",
@@ -27,9 +31,17 @@
   },
   "homepage": "https://github.com/jvilk/MakeTypes#readme",
   "devDependencies": {
-    "@types/node": "0.0.2",
+    "@types/bootstrap": "^3.3.32",
+    "@types/codemirror": "0.0.35",
+    "@types/jquery": "^2.0.34",
+    "@types/node": "^6.0.52",
     "@types/yargs": "^6.3.3",
-    "typescript": "^2.1.4"
+    "codemirror": "^5.21.0",
+    "maketypes": "^1.0.0",
+    "npm-run-all": "^3.1.2",
+    "typescript": "^2.1.4",
+    "webpack": "^1.14.0",
+    "webpack-dev-server": "^1.16.2"
   },
   "dependencies": {
     "yargs": "^6.5.0"

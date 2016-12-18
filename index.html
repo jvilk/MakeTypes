@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MakeTypes from JSON samples</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.21.0/codemirror.min.css">
+    <link href="index.css" rel="stylesheet">
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">MakeTypes</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+      <div class="container">
+        <h1>MakeTypes from JSON samples</h1>
+        <p>MakeTypes generates TypeScript classes that parse and typecheck JSON objects at runtime, and let you statically type check code that interacts with JSON objects. All it requires is a set of JSON samples.</p>
+        <p>Want to run MakeTypes as part of a build process? <tt>npm i -g maketypes</tt> installs the command line tool <tt>maketypes</tt>.</p>
+        <p><a class="btn btn-primary btn-lg" href="https://npmjs.com/package/maketypes" role="button"><tt>maketypes</tt> on NPM &raquo;</a></p>
+        <p><a class="btn btn-default btn-lg" href="https://github.com/jvilk/MakeTypes" role="button">Source Code on GitHub &raquo;</a></p>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="row">
+            <div class="col-md-12">
+              <h2>Input: JSON Examples</h2>
+              <p>Enter a single JSON object or an array of JSON objects.</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <div class="input-group-lg">
+                  <input type="text" class="form-control" id="type-name" placeholder="Name">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <textarea id="json-examples"></textarea>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="input-group">
+                <button class="btn btn-default btn-lg" type="button" id="upload-btn">Upload JSON...</button>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-group pull-right">
+                <button class="btn btn-primary btn-lg" type="button" id="generate-btn">Generate</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="row">
+            <div class="col-md-12">
+              <h2>Output: TypeScript Interfaces</h2>
+              <p>Use these if you want to statically type check interactions with JSON objects without runtime type checks.</p>
+              <textarea id="ts-interfaces"></textarea>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <h2>Output: TypeScript Proxies</h2>
+              <p>Use these if you want to statically type check interactions with JSON objects with runtime type checks.</p>
+              <textarea id="ts-proxies"></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4">
+          <h3>Type-checked <tt>JSON.parse</tt></h3>
+          <p>Proxy classes generated with MakeTypes will parse your JSON and check that it matches the expected type <i>at runtime</i>.</p>
+        </div>
+        <div class="col-md-4">
+          <h3>Statically type check code that interacts with JSON objects</h3>
+          <p>Proxy objects generated with MakeTypes are expressed as TypeScript classes, so you can statically type check that your code is appropriately accessing fields on the JSON object. Code against web services with confidence!</p>
+       </div>
+        <div class="col-md-4">
+          <h3>Generate TypeScript interfaces to describe JSON types</h3>
+          <p>Don't want the overhead of runtime type checking, and trust that your samples are representative? Or perhaps you are reluctant to manually create TypeScript typings for your web service? MakeTypes can generate TypeScript interfaces, which describe the expected structure of the JSON object and facilitate static type checking.</p>
+        </div>
+      </div>
+
+      <hr>
+
+      <footer>
+        <p>Created by John Vilk. MakeTypes is available under the MIT License.</p>
+      </footer>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="index.js"></script>
+  </body>
+</html>

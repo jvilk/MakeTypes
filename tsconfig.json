@@ -10,11 +10,11 @@
         "inlineSourceMap": true,
         "strictNullChecks": true,
         "lib": [
-            "es6", "es2015.collection"
-        ]
+            "es6", "es2015.collection", "dom"
+        ],
+        "outDir": "js"
     },
     "include": [
-        "index.ts",
-        "lib/**/*.ts"
+        "ts/**/*.ts"
     ]
 }
