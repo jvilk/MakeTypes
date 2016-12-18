@@ -441,6 +441,9 @@ export class CRecordShape {
     this.forEachField((t, name) => {
       w.tab(1).writeln(`public readonly ${name}: ${t.getProxyType(e)};`);
     });
+    w.tab(1).writeln(`public static Parse(d: string): ${this.getProxyType(e)} {`);
+    w.tab(2).writeln(`return ${this.getProxyClass(e)}.Create(JSON.parse(d));`);
+    w.tab(1).writeln(`}`);
     w.tab(1).writeln(`public static Create(d: any): ${this.getProxyType(e)} {`);
     w.tab(2).writeln(`if (d === null || d === undefined) {`);
     w.tab(3);
