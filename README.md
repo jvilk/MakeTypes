@@ -69,6 +69,9 @@ Proxy generated from example:
 export class RootNameProxy {
   public readonly foo: string;
   public readonly baz: number | null;
+  public static Parse(d: string): RootNameProxy {
+    return RootNameProxy.Create(JSON.parse(d));
+  }
   public static Create(d: any): RootNameProxy {
     if (d === null || d === undefined) {
       throwNull2NonNull("RootName");
