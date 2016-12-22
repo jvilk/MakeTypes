@@ -22,7 +22,22 @@ function capitalize(n: string): string {
   return `${n[0].toUpperCase()}${n.slice(1)}`;
 }
 
-
+export function getReferencedRecordShapes(e: Emitter, s: Set<CRecordShape>, sh: Shape): void {
+  switch (sh.type) {
+    case BaseShape.RECORD:
+      if (!s.has(sh)) {
+        s.add(sh);
+        sh.getReferencedRecordShapes(e, s);
+      }
+      break;
+    case BaseShape.COLLECTION:
+      getReferencedRecordShapes(e, s, sh.baseShape);
+      break;
+    case BaseShape.ANY:
+      sh.getDistilledShapes(e).forEach((sh) => getReferencedRecordShapes(e, s, sh));
+      break;
+  }
+}
 
 export class FieldContext {
   public get type(): ContextType.FIELD {
@@ -36,7 +51,7 @@ export class FieldContext {
   }
   public getName(e: Emitter): string {
     const name = capitalize(this.field);
-    return `${this.parent.getName(e)}${name}`;
+    return name;
   }
 }
 
@@ -259,7 +274,13 @@ export class CAnyShape {
     return new CAnyShape(shapeClone, this._nullable);
   }
   public emitType(e: Emitter): void {
-    e.interfaces.write(this.getProxyType(e));
+    this._ensureDistilled(e);
+    this._distilledShapes.forEach((s, i) => {
+      s.emitType(e);
+      if (i < this._distilledShapes.length - 1) {
+        e.interfaces.write(" | ");
+      }
+    });
   }
   public getProxyType(e: Emitter): string {
     this._ensureDistilled(e);
@@ -419,18 +440,9 @@ export class CRecordShape {
     w.tab(1).writeln(`}`);
     w.writeln('}');
   }
-  public getReferencedRecordShapes(rv: Set<CRecordShape>): void {
+  public getReferencedRecordShapes(e: Emitter, rv: Set<CRecordShape>): void {
     this.forEachField((t, name) => {
-      if (t.type === BaseShape.RECORD && !rv.has(t)) {
-        rv.add(t);
-        t.getReferencedRecordShapes(rv);
-      } else if (t.type === BaseShape.COLLECTION) {
-        const base = t.baseShape;
-        if (base.type === BaseShape.RECORD && !rv.has(base)) {
-          rv.add(base);
-          base.getReferencedRecordShapes(rv);
-        }
-      }
+      getReferencedRecordShapes(e, rv, t);
     });
   }
   public markAsRoot(name: string): void {

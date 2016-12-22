@@ -1,5 +1,5 @@
 import Writer from './writer';
-import {CRecordShape, BaseShape, d2s, Shape} from './Types';
+import {CRecordShape, BaseShape, d2s, Shape, getReferencedRecordShapes} from './Types';
 
 export function emitProxyTypeCheck(e: Emitter, w: Writer, t: Shape, tabLevel: number, dataVar: string): void {
   switch(t.type) {
@@ -78,15 +78,17 @@ export default class Emitter {
     if (rootShape.type === BaseShape.COLLECTION) {
       rootShape = rootShape.baseShape;
     }
-    this._claimedNames.add(rootName);
     if (rootShape.type !== BaseShape.RECORD) {
-      if (rootShape.type === BaseShape.COLLECTION) {
-        let baseShape = rootShape.baseShape;
-        while (baseShape.type === BaseShape.COLLECTION) {
-          baseShape = baseShape.baseShape;
-        }
-        if (baseShape.type === BaseShape.RECORD) {
-          this._emitRootRecordShape(baseShape);
+      this._claimedNames.add(rootName);
+      const roots = new Set<CRecordShape>();
+      getReferencedRecordShapes(this, roots, rootShape);
+      let rootArray = new Array<CRecordShape>();
+      roots.forEach((root) => rootArray.push(root));
+      if (rootArray.length === 1) {
+        this._emitRootRecordShape(`${rootName}Entity`, rootArray[0]);
+      } else {
+        for (let i = 0; i < rootArray.length; i++) {
+          this._emitRootRecordShape(`${rootName}Entity${i}`, rootArray[i]);
         }
       }
       this.interfaces.write(`export type ${rootName} = `)
@@ -102,18 +104,19 @@ export default class Emitter {
       this.proxies.tab(1).writeln(`}`);
       this.proxies.writeln(`}`).endl();
     } else {
-      rootShape.markAsRoot(rootName);
-      this._emitRootRecordShape(rootShape);
+      this._emitRootRecordShape(rootName, rootShape);
     }
     this._emitProxyHelpers();
   }
-  private _emitRootRecordShape(rootShape: CRecordShape) {
+  private _emitRootRecordShape(name: string, rootShape: CRecordShape) {
+    this._claimedNames.add(name);
+    rootShape.markAsRoot(name);
     rootShape.emitInterfaceDefinition(this);
     rootShape.emitProxyClass(this);
     this.interfaces.endl();
     this.proxies.endl();
     const set = new Set<CRecordShape>();
-    rootShape.getReferencedRecordShapes(set);
+    rootShape.getReferencedRecordShapes(this, set);
     set.forEach((shape) => {
       shape.emitInterfaceDefinition(this);
       shape.emitProxyClass(this);
