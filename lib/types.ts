@@ -206,6 +206,8 @@ export class CAnyShape {
   }
   private readonly _shapes: Shape[];
   private readonly _nullable: boolean = false;
+  private _hasDistilledShapes: boolean = false;
+  private _distilledShapes: Shape[] = [];
   constructor(shapes: Shape[], nullable: boolean) {
     this._shapes = shapes;
     this._nullable = nullable;
@@ -227,16 +229,41 @@ export class CAnyShape {
       return this;
     }
   }
+  private _ensureDistilled(e: Emitter): void {
+    if (!this._hasDistilledShapes) {
+      let shapes = new Map<BaseShape, Shape[]>();
+      for (let i = 0; i < this._shapes.length; i++) {
+        const s = this._shapes[i];
+        if (!shapes.has(s.type)) {
+          shapes.set(s.type, []);
+        }
+        shapes.get(s.type)!.push(s);
+      }
+      shapes.forEach((shapes, key) => {
+        let shape: Shape = BottomShape;
+        for (let i = 0; i < shapes.length; i++) {
+          shape = csh(e, shape, shapes[i]);
+        }
+        this._distilledShapes.push(shape);
+      });
+      this._hasDistilledShapes = true;
+    }
+  }
+  public getDistilledShapes(e: Emitter): Shape[] {
+    this._ensureDistilled(e);
+    return this._distilledShapes;
+  }
   public addToShapes(shape: Shape): CAnyShape {
     const shapeClone = this._shapes.slice(0);
     shapeClone.push(shape);
     return new CAnyShape(shapeClone, this._nullable);
   }
   public emitType(e: Emitter): void {
-    e.interfaces.write("any");
+    e.interfaces.write(this.getProxyType(e));
   }
   public getProxyType(e: Emitter): string {
-    return "any";
+    this._ensureDistilled(e);
+    return this._distilledShapes.map((s) => s.getProxyType(e)).join(" | ");
   }
   public equal(t: Shape): boolean {
     return this === t;

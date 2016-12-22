@@ -17,6 +17,8 @@ import {Null} from './generated/Null';
 import {Nulls} from './generated/Nulls';
 import {MaybeNumberProxy} from './generated/MaybeNumberProxy';
 import {MaybeNumber} from './generated/MaybeNumber';
+import {BooleanOrStringProxy} from './generated/BooleanOrStringProxy';
+import {BooleanOrString} from './generated/BooleanOrString';
 
 describe('Primitive Types', () => {
   it('Number', () => {
@@ -96,5 +98,15 @@ describe('Primitive Types', () => {
     let n: number = 3;
     let m: MaybeNumber = n;
     m = null;
+  });
+
+  it("Boolean or string", () => {
+    parseEquals(BooleanOrStringProxy, `true`, true);
+    parseEquals(BooleanOrStringProxy, `"hello"`, "hello");
+    parseThrows(BooleanOrStringProxy, '[]');
+    let b: boolean = true;
+    let s: string = "hello";
+    let bs: BooleanOrString = b;
+    bs = s;
   });
 });

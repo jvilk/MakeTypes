@@ -4,7 +4,20 @@ import {CRecordShape, BaseShape, d2s, Shape} from './Types';
 export function emitProxyTypeCheck(e: Emitter, w: Writer, t: Shape, tabLevel: number, dataVar: string): void {
   switch(t.type) {
   case BaseShape.ANY:
-    // Trivially passes.
+    // TODO: This is terrible.
+    const distilledShapes = t.getDistilledShapes(e);
+    w.tab(tabLevel).writeln(`// This will be refactored in the next release.`);
+    distilledShapes.forEach((s, i) => {
+      w.tab(tabLevel + i).writeln(`try {`);
+      emitProxyTypeCheck(e, w, s, tabLevel + i + 1, dataVar);
+      w.tab(tabLevel + i).writeln(`} catch (e) {`);
+      if (i === distilledShapes.length - 1) {
+        w.tab(tabLevel + i + 1).writeln(`throw e;`);
+      }
+    });
+    for (let i = 0; i < distilledShapes.length; i++) {
+      w.tab(tabLevel + (distilledShapes.length - i - 1)).writeln(`}`);
+    }
     break;
   case BaseShape.BOOLEAN:
     e.markHelperAsUsed('checkBoolean');
