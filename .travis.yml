@@ -1,0 +1,21 @@
+language: node_js
+node_js:
+  - "4"
+
+sudo: false
+
+cache:
+  directories:
+    - node_modules
+
+before_install:
+  - "node --version"
+  - "npm --version"
+  - "nvm --version"
+
+install:
+  - "npm install"
+
+script:
+  - "npm run coverage"
+  - "npm test"
