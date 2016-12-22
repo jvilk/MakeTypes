@@ -12,6 +12,7 @@
     "istanbul": "istanbul cover ./test/common/generateSamples.js",
     "coverage": "npm-run-all --serial prepublish istanbul",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "travis": "npm-run-all --serial test coverage coveralls",
     "test": "npm-run-all --serial prepublish generate:test build:test mocha"
   },
   "bin": {
