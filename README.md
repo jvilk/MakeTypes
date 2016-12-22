@@ -1,4 +1,4 @@
-# MakeTypes 1.0.0
+# MakeTypes 1.1.0
 > Generate TypeScript types and proxy classes from example JSON objects. Type check JSON objects at runtime!
 
 [![NPM version](https://badge.fury.io/js/maketypes.svg)](http://badge.fury.io/js/maketypes)
@@ -157,5 +157,3 @@ let baz = rawJson.baz; // TypeScript knows that baz is an optional field that ma
 
 MakeTypes uses the Common Preferred Shape Relation from Petricek et al.'s PLDI 2016 paper, ["Types from Data: Making Structured Data First-Class Citizens in F#"](https://dl.acm.org/citation.cfm?id=2908115).
 Since JavaScript/TypeScript lacks a distinction between integer and floating point types, we merge the `float` and `int` types into a `number` type.
-
-At the moment, MakeTypes does not implement labelled top shapes. We plan to address this limitation in the next release.
