@@ -18,5 +18,3 @@ install:
 
 script:
   - "npm run travis"
-  - "npm run coverage"
-  - "npm run coveralls"
