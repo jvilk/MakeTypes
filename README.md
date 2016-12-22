@@ -2,6 +2,8 @@
 > Generate TypeScript types and proxy classes from example JSON objects. Type check JSON objects at runtime!
 
 [![NPM version](https://badge.fury.io/js/maketypes.svg)](http://badge.fury.io/js/maketypes)
+[![Build Status](https://travis-ci.org/jvilk/MakeTypes.svg?branch=master)](https://travis-ci.org/jvilk/MakeTypes)
+[![Coverage Status](https://coveralls.io/repos/github/jvilk/MakeTypes/badge.svg?branch=master)](https://coveralls.io/github/jvilk/MakeTypes?branch=master)
 
 With MakeTypes, you can interact with REST endpoints and other sources of JSON with confidence that
 your program receives the data you expect. **All you need is a file containing representative sample JSON objects.**

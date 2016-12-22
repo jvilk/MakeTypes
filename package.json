@@ -11,6 +11,7 @@
     "mocha": "mocha",
     "istanbul": "istanbul cover ./test/common/generateSamples.js",
     "coverage": "npm-run-all --serial prepublish istanbul",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
     "test": "npm-run-all --serial prepublish generate:test build:test mocha"
   },
   "bin": {
@@ -36,6 +37,7 @@
     "@types/mocha": "^2.2.34",
     "@types/node": "0.0.2",
     "@types/yargs": "^6.3.3",
+    "coveralls": "^2.11.15",
     "istanbul": "^1.0.0-alpha",
     "mocha": "^3.2.0",
     "npm-run-all": "^3.1.2",
