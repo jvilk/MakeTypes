@@ -18,8 +18,8 @@ export const enum ContextType {
   FIELD
 }
 
-function capitalize(n: string): string {
-  return `${n[0].toUpperCase()}${n.slice(1)}`;
+function pascalCase(n: string): string {
+  return n.split("_").map((s) => s[0].toUpperCase() + s.slice(1)).join("");
 }
 
 export function getReferencedRecordShapes(e: Emitter, s: Set<CRecordShape>, sh: Shape): void {
@@ -50,7 +50,7 @@ export class FieldContext {
     this.field = field;
   }
   public getName(e: Emitter): string {
-    const name = capitalize(this.field);
+    const name = pascalCase(this.field);
     return name;
   }
 }
@@ -377,6 +377,9 @@ export class CRecordShape {
   }
   public emitType(e: Emitter): void {
     e.interfaces.write(this.getName(e));
+    if (this.nullable) {
+      e.interfaces.write(" | null");
+    }
   }
   public getProxyClass(e: Emitter): string {
     return `${this.getName(e)}Proxy`;
@@ -499,14 +502,14 @@ export class CCollectionShape {
   public emitType(e: Emitter): void {
     e.interfaces.write("(");
     this.baseShape.emitType(e);
-    e.interfaces.write(")[]");
+    e.interfaces.write(")[] | null");
   }
   public getProxyType(e: Emitter): string {
     const base = this.baseShape.getProxyType(e);
     if (base.indexOf("|") !== -1) {
-      return `(${base})[]`;
+      return `(${base})[] | null`;
     } else {
-      return `${base}[]`;
+      return `${base}[] | null`;
     }
   }
   public equal(t: Shape): boolean {
@@ -607,6 +610,10 @@ export function d2s(e: Emitter, d: any): Shape {
 
   // Must be an object or array.
   if (Array.isArray(d)) {
+    // Empty array: Not enough information to figure out a precise type.
+    if (d.length === 0) {
+      return new CCollectionShape(NullShape);
+    }
     let t: Shape = BottomShape;
     for (let i = 0; i < d.length; i++) {
       t = csh(e, t, d2s(e, d[i]));
