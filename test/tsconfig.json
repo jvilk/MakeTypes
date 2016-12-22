@@ -15,8 +15,7 @@
         "declaration": true
     },
     "include": [
-        "index.ts",
-        "lib/**/*.ts",
-        "test/common/*.ts"
+        "*.ts",
+        "generated/*.ts"
     ]
 }

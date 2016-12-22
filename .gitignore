@@ -1,4 +1,4 @@
 *.js
 *.d.ts
 node_modules
-
+/test/generated

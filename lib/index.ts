@@ -7,6 +7,6 @@ import CbWriter from './cb_writer';
 import NopWriter from './nop_writer';
 import StreamWriter from './stream_writer';
 import * as Types from './types';
-import {Emitter} from './types';
+import {default as Emitter} from './emit';
 
 export {Writer, CbWriter, NopWriter, StreamWriter, Types, Emitter};

@@ -6,7 +6,10 @@
   "types": "lib/index",
   "scripts": {
     "prepublish": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "generate:test": "node ./test/common/generateSamples.js",
+    "build:test": "tsc -p test/tsconfig.json",
+    "mocha": "mocha",
+    "test": "npm-run-all --serial prepublish generate:test build:test mocha"
   },
   "bin": {
     "make_types": "./index.js"
@@ -28,8 +31,11 @@
   },
   "homepage": "https://github.com/jvilk/MakeTypes#readme",
   "devDependencies": {
+    "@types/mocha": "^2.2.34",
     "@types/node": "0.0.2",
     "@types/yargs": "^6.3.3",
+    "mocha": "^3.2.0",
+    "npm-run-all": "^3.1.2",
     "typescript": "^2.1.4"
   },
   "dependencies": {

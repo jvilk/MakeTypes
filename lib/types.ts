@@ -1,4 +1,4 @@
-import Writer from './writer';
+import {default as Emitter, emitProxyTypeCheck} from './emit';
 
 export const enum BaseShape {
   BOTTOM,
@@ -22,87 +22,7 @@ function capitalize(n: string): string {
   return `${n[0].toUpperCase()}${n.slice(1)}`;
 }
 
-/**
- * Emit helper functions for the proxies.
- */
-function emitProxyHelpers(e: Emitter): void {
-  const w = e.proxies;
-  w.writeln(`function throwNull2NonNull(c: string): never {`)
-  w.tab(1).writeln(`throw new TypeError("Cannot assign null to non-nullable type " + c);`);
-  w.writeln(`}`);
-  w.writeln(`function throwNotObject(c: string): never {`);
-  w.tab(1).writeln(`throw new TypeError("Cannot assign non-object to type " + c);`);
-  w.writeln(`}`);
-  w.writeln(`function throwIsArray(c: string): never {`);
-  w.tab(1).writeln(`throw new TypeError("Cannot assign array to type " + c);`);
-  w.writeln(`}`);
-  w.writeln(`function checkArray(d: any): void {`)
-  w.tab(1).writeln(`if (!Array.isArray(d) && (d !== null || d !== undefined)) {`);
-  w.tab(2).writeln(`throw new Error('Expected an array or null.');`);
-  w.tab(1).writeln(`}`);
-  w.writeln(`}`);
-  w.writeln(`function checkNumber(d: any, nullable: boolean): void {`)
-  w.tab(1).writeln(`if (typeof(d) !== 'number' && (!nullable || (nullable && (d === null || d === undefined)))) {`);
-  w.tab(2).writeln(`throw new Error('Expected a number.');`);
-  w.tab(1).writeln(`}`);
-  w.writeln(`}`);
-  w.writeln(`function checkBoolean(d: any, nullable: boolean): void {`)
-  w.tab(1).writeln(`if (typeof(d) !== 'boolean' && (!nullable || (nullable && (d === null || d === undefined)))) {`);
-  w.tab(2).writeln(`throw new Error('Expected a boolean.');`);
-  w.tab(1).writeln(`}`);
-  w.writeln(`}`);
-  w.writeln(`function checkString(d: any, nullable: boolean): void {`)
-  w.tab(1).writeln(`if (typeof(d) !== 'string' && (!nullable || (nullable && (d === null || d === undefined)))) {`);
-  w.tab(2).writeln(`throw new Error('Expected a string.');`);
-  w.tab(1).writeln(`}`);
-  w.writeln(`}`);
-  w.writeln(`function checkNull(d: any): void {`)
-  w.tab(1).writeln(`if (d !== null && d !== undefined) {`);
-  w.tab(2).writeln(`throw new Error('Expected a null value.');`);
-  w.tab(1).writeln(`}`);
-  w.writeln(`}`);
-}
 
-function emitProxyTypeCheck(e: Emitter, w: Writer, t: Shape, tabLevel: number, dataVar: string): void {
-  switch(t.type) {
-  case BaseShape.ANY:
-    // Trivially passes.
-    break;
-  case BaseShape.BOOLEAN:
-    w.tab(tabLevel).writeln(`checkBoolean(${dataVar}, ${t.nullable});`);
-    break;
-  case BaseShape.BOTTOM:
-    throw new TypeError('Impossible: Bottom should never appear in a type.');
-  case BaseShape.COLLECTION:
-    w.tab(tabLevel).writeln(`checkArray(${dataVar});`);
-    w.tab(tabLevel).writeln(`if (${dataVar}) {`)
-    // Now, we check each element.
-    w.tab(tabLevel + 1).writeln(`for (let i = 0; i < ${dataVar}.length; i++) {`)
-    emitProxyTypeCheck(e, w, t.baseShape, tabLevel + 2, `${dataVar}[i]`);
-    w.tab(tabLevel + 1).writeln(`}`);
-    w.tab(tabLevel).writeln(`}`);
-    break;
-  case BaseShape.NULL:
-    w.tab(tabLevel).writeln(`checkNull(${dataVar});`);
-    break;
-  case BaseShape.NUMBER:
-    w.tab(tabLevel).writeln(`checkNumber(${dataVar}, ${t.nullable});`);
-    break;
-  case BaseShape.RECORD:
-    // Convert into a proxy.
-    w.tab(tabLevel).writeln(`${dataVar} = ${t.getProxyClass(e)}.Create(${dataVar});`);
-    break;
-  case BaseShape.STRING:
-    w.tab(tabLevel).writeln(`checkString(${dataVar}, ${t.nullable});`);
-    break;
-  }
-  // Standardize undefined into null.
-  if (t.nullable) {
-    w.tab(tabLevel).writeln(`if (${dataVar} === undefined) {`)
-    w.tab(tabLevel + 1).writeln(`${dataVar} = null;`);
-    w.tab(tabLevel).writeln(`}`);
-  }
-}
 
 export class FieldContext {
   public get type(): ContextType.FIELD {
@@ -450,11 +370,14 @@ export class CRecordShape {
     if (this.nullable) {
       w.writeln(`return null;`);
     } else {
+      e.markHelperAsUsed('throwNull2NonNull');
       w.writeln(`throwNull2NonNull("${name}");`);
     }
     w.tab(2).writeln(`} else if (typeof(d) !== 'object') {`);
+    e.markHelperAsUsed('throwNotObject');
     w.tab(3).writeln(`throwNotObject("${name}");`);
     w.tab(2).writeln(`} else if (Array.isArray(d)) {`)
+    e.markHelperAsUsed('throwIsArray');
     w.tab(3).writeln(`throwIsArray("${name}");`);
     w.tab(2).writeln(`}`);
     w.tab(2).writeln(`return new ${this.getProxyClass(e)}(d);`);
@@ -567,78 +490,6 @@ export class CCollectionShape {
       })
       .join("Or");
     return this._name;
-  }
-}
-
-export class Emitter {
-  private _records: CRecordShape[] = [];
-  private _claimedNames = new Set<string>();
-  public readonly interfaces: Writer;
-  public readonly proxies: Writer;
-  constructor (interfaces: Writer, proxies: Writer) {
-    this.interfaces = interfaces;
-    this.proxies = proxies;
-  }
-  public emit(root: any, rootName: string): void {
-    const shape = d2s(this, root);
-    let rootShape: CRecordShape;
-    if (shape.type === BaseShape.COLLECTION) {
-      rootShape = <CRecordShape> shape.baseShape;
-    } else {
-      rootShape = <CRecordShape> shape;
-    }
-    if (rootShape.type !== BaseShape.RECORD) {
-      throw new TypeError(`Expected samples to be records.`);
-    }
-
-    emitProxyHelpers(this);
-    this._claimedNames.add(rootName);
-    rootShape.markAsRoot(rootName);
-    rootShape.emitInterfaceDefinition(this);
-    rootShape.emitProxyClass(this);
-    this.interfaces.endl();
-    this.proxies.endl();
-    const set = new Set<CRecordShape>();
-    rootShape.getReferencedRecordShapes(set);
-    set.forEach((shape) => {
-      shape.emitInterfaceDefinition(this);
-      shape.emitProxyClass(this);
-      this.interfaces.endl();
-      this.proxies.endl();
-    });
-  }
-  /**
-   * Registers the provided shape with the emitter. If an equivalent shape
-   * already exists, then the emitter returns the equivalent shape.
-   */
-  public registerRecordShape(s: CRecordShape): CRecordShape {
-    const rv = this._records.filter((r) => r.equal(s));
-    if (rv.length === 0) {
-      this._records.push(s);
-      return s;
-    } else {
-      return rv[0];
-    }
-  }
-  /**
-   * Registers the provided shape name with the emitter. If another
-   * shape has already claimed this name, it returns a similar unique
-   * name that should be used instead.
-   */
-  public registerName(name: string): string {
-    if (!this._claimedNames.has(name)) {
-      this._claimedNames.add(name);
-      return name;
-    } else {
-      let baseName = name;
-      let i = 1;
-      do {
-        name = `${baseName}${i}`;
-        i++;
-      } while (this._claimedNames.has(name));
-      this._claimedNames.add(name);
-      return name;
-    }
   }
 }
 
