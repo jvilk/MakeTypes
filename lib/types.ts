@@ -407,7 +407,6 @@ export class CRecordShape {
   }
   public emitProxyClass(e: Emitter): void {
     const w = e.proxies;
-    const name = this.getName(e);
     w.writeln(`export class ${this.getProxyClass(e)} {`);
     this.forEachField((t, name) => {
       w.tab(1).writeln(`public readonly ${name}: ${t.getProxyType(e)};`);
@@ -415,29 +414,36 @@ export class CRecordShape {
     w.tab(1).writeln(`public static Parse(d: string): ${this.getProxyType(e)} {`);
     w.tab(2).writeln(`return ${this.getProxyClass(e)}.Create(JSON.parse(d));`);
     w.tab(1).writeln(`}`);
-    w.tab(1).writeln(`public static Create(d: any): ${this.getProxyType(e)} {`);
+    w.tab(1).writeln(`public static Create(d: any, field: string = 'root'): ${this.getProxyType(e)} {`);
+    w.tab(2).writeln(`if (!field) {`);
+    w.tab(3).writeln(`obj = d;`);
+    w.tab(3).writeln(`field = "root";`);
+    w.tab(2).writeln(`}`);
     w.tab(2).writeln(`if (d === null || d === undefined) {`);
     w.tab(3);
     if (this.nullable) {
       w.writeln(`return null;`);
     } else {
       e.markHelperAsUsed('throwNull2NonNull');
-      w.writeln(`throwNull2NonNull("${name}");`);
+      w.writeln(`throwNull2NonNull(field, d);`);
     }
     w.tab(2).writeln(`} else if (typeof(d) !== 'object') {`);
     e.markHelperAsUsed('throwNotObject');
-    w.tab(3).writeln(`throwNotObject("${name}");`);
+    w.tab(3).writeln(`throwNotObject(field, d, ${this.nullable});`);
     w.tab(2).writeln(`} else if (Array.isArray(d)) {`)
     e.markHelperAsUsed('throwIsArray');
-    w.tab(3).writeln(`throwIsArray("${name}");`);
+    w.tab(3).writeln(`throwIsArray(field, d, ${this.nullable});`);
     w.tab(2).writeln(`}`);
-    w.tab(2).writeln(`return new ${this.getProxyClass(e)}(d);`);
-    w.tab(1).writeln(`}`);
-    w.tab(1).writeln(`private constructor(d: any) {`);
     // At this point, we know we have a non-null object.
     // Check all fields.
     this.forEachField((t, name) => {
-      emitProxyTypeCheck(e, w, t, 2, `d.${name}`);
+      emitProxyTypeCheck(e, w, t, 2, `d.${name}`, `field + ".${name}"`);
+    });
+    w.tab(2).writeln(`return new ${this.getProxyClass(e)}(d);`);
+    w.tab(1).writeln(`}`);
+    w.tab(1).writeln(`private constructor(d: any) {`);
+    // Emit an assignment for each field.
+    this.forEachField((t, name) => {
       w.tab(2).writeln(`this.${name} = d.${name};`);
     });
     w.tab(1).writeln(`}`);
