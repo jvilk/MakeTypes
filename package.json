@@ -1,6 +1,6 @@
 {
   "name": "maketypes",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Make TypeScript types and proxy objects from example JSON objects. Can use proxy objects to dynamically type check JSON at runtime.",
   "main": "lib/index.js",
   "types": "lib/index",

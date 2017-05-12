@@ -1,4 +1,4 @@
-# MakeTypes 1.1.1
+# MakeTypes 1.1.2
 > Generate TypeScript types and proxy classes from example JSON objects. Type check JSON objects at runtime!
 
 [![NPM version](https://badge.fury.io/js/maketypes.svg)](http://badge.fury.io/js/maketypes)
