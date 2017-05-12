@@ -19,7 +19,7 @@ export const enum ContextType {
 }
 
 function pascalCase(n: string): string {
-  return n.split("_").map((s) => s[0].toUpperCase() + s.slice(1)).join("");
+  return n.split("_").map((s) => (s[0] ? s[0].toUpperCase() : "") + s.slice(1)).join("");
 }
 
 export function getReferencedRecordShapes(e: Emitter, s: Set<CRecordShape>, sh: Shape): void {
