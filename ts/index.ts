@@ -1,6 +1,7 @@
 import * as CodeMirror from 'codemirror';
 import {Emitter, CbWriter} from 'maketypes';
 import {saveAs} from 'file-saver';
+import * as Clipboard from 'clipboard';
 require('codemirror/mode/javascript/javascript');
 
 function createDiagnosticError(cm: CodeMirror.Editor, pos: {row: number, col: number} | number, msg: string): void {
@@ -40,6 +41,8 @@ const generateBtn = document.getElementById('generate-btn') as HTMLButtonElement
 const nameInput = document.getElementById('type-name') as HTMLInputElement;
 const saveInterfaceBtn = document.getElementById('save-interface-btn') as HTMLButtonElement;
 const saveProxyBtn = document.getElementById('save-proxy-btn') as HTMLButtonElement;
+const copyInterfaceBtn = document.getElementById('copy-interface-btn') as HTMLButtonElement;
+const copyProxyBtn = document.getElementById('copy-proxy-btn') as HTMLButtonElement;
 
 function getRootName(): string {
   const val = nameInput.value.replace(/ /g, "");
@@ -72,12 +75,32 @@ const tsProxy = CodeMirror.fromTextArea(document.getElementById('ts-proxies') as
   viewportMargin: 10
 });
 
+new Clipboard('#copy-interface-btn', {
+  text: function(trigger) {
+      return tsInterface.getDoc().getValue();
+  }
+});
+
+new Clipboard('#copy-proxy-btn', {
+  text: function(trigger) {
+      return tsProxy.getDoc().getValue();
+  }
+});
+
 saveInterfaceBtn.addEventListener('click', () => {
   saveToFile(tsInterface, `${getRootName()}.d.ts`);
 });
 
 saveProxyBtn.addEventListener('click', () => {
   saveToFile(tsProxy, `${getRootName()}.ts`);
+});
+
+copyInterfaceBtn.addEventListener('click', () => {
+
+});
+
+copyProxyBtn.addEventListener('click', () => {
+
 });
 
 generateBtn.addEventListener('click', () => {
