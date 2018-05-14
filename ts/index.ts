@@ -41,8 +41,6 @@ const generateBtn = document.getElementById('generate-btn') as HTMLButtonElement
 const nameInput = document.getElementById('type-name') as HTMLInputElement;
 const saveInterfaceBtn = document.getElementById('save-interface-btn') as HTMLButtonElement;
 const saveProxyBtn = document.getElementById('save-proxy-btn') as HTMLButtonElement;
-const copyInterfaceBtn = document.getElementById('copy-interface-btn') as HTMLButtonElement;
-const copyProxyBtn = document.getElementById('copy-proxy-btn') as HTMLButtonElement;
 
 function getRootName(): string {
   const val = nameInput.value.replace(/ /g, "");
@@ -93,14 +91,6 @@ saveInterfaceBtn.addEventListener('click', () => {
 
 saveProxyBtn.addEventListener('click', () => {
   saveToFile(tsProxy, `${getRootName()}.ts`);
-});
-
-copyInterfaceBtn.addEventListener('click', () => {
-
-});
-
-copyProxyBtn.addEventListener('click', () => {
-
 });
 
 generateBtn.addEventListener('click', () => {
