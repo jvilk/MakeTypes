@@ -9,6 +9,7 @@
         "alwaysStrict": true,
         "inlineSourceMap": true,
         "strictNullChecks": true,
+        "noUnusedLocals": false,
         "lib": [
             "es6", "es2015.collection"
         ],
