@@ -35,12 +35,12 @@
   },
   "homepage": "https://github.com/jvilk/MakeTypes#readme",
   "devDependencies": {
-    "@types/mocha": "^2.2.34",
+    "@types/mocha": "^5.2.4",
     "@types/node": "0.0.2",
     "@types/yargs": "^6.3.3",
-    "coveralls": "^2.11.15",
+    "coveralls": "^3.0.2",
     "istanbul": "^1.0.0-alpha",
-    "mocha": "^3.2.0",
+    "mocha": "^5.2.0",
     "npm-run-all": "^3.1.2",
     "typescript": "^2.1.4"
   },
