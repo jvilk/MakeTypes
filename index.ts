@@ -2,9 +2,8 @@
 import * as yargs from 'yargs';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as glob from 'glob';
 
-import { StreamWriter, NopWriter, Emitter } from './lib/index';
+import {StreamWriter, NopWriter, Emitter} from './lib/index';
 
 const argv = yargs.usage('Usage: $0 [options] inputFile [...] rootName')
   .alias('i', 'interface-file')
@@ -39,10 +38,8 @@ if (argv._.length < 2) {
 
 const samplesArray = new Array<any>();
 
-for (const sampleParam of argv._.slice(0, -1)) {
-  for (const samplePath of glob.sync(sampleParam)) {
-    samplesArray.push(JSON.parse(fs.readFileSync(samplePath).toString()));
-  }
+for (const samplePath of argv._.slice(0, -1)) {
+  samplesArray.push(JSON.parse(fs.readFileSync(samplePath).toString()));
 }
 
 const samples = samplesArray.length === 1 ? samplesArray[0] : samplesArray;
