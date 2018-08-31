@@ -5,7 +5,7 @@ import * as path from 'path';
 
 import {StreamWriter, NopWriter, Emitter} from './lib/index';
 
-const argv = yargs.usage('Usage: $0 [options] inputFile rootName')
+const argv = yargs.usage('Usage: $0 [options] inputFile [...] rootName')
   .alias('i', 'interface-file')
   .string('i')
   .describe('i', 'Specify output file for interfaces')
@@ -29,12 +29,21 @@ if (argv.i) {
 if (argv.p) {
   proxyWriter = new StreamWriter(fs.createWriteStream(argv.p));
 }
-if (argv._.length !== 2) {
-  console.error(`Please supply an input file with samples in a JSON array, and a symbol to use for the root interface / proxy.`);
+
+if (argv._.length < 2) {
+  console.error(`Please supply one input file with samples in a JSON array or multiple files, and a symbol to use for the root interface / proxy.`);
   yargs.showHelp();
   process.exit(1);
 }
 
-const samples = JSON.parse(fs.readFileSync(argv._[0]).toString());
+const samplesArray = new Array<any>();
+
+for (const samplePath of argv._.slice(0, -1)) {
+  samplesArray.push(JSON.parse(fs.readFileSync(samplePath).toString()));
+}
+
+const samples = samplesArray.length === 1 ? samplesArray[0] : samplesArray;
+const rootName = argv._.slice(-1)[0];
+
 const e = new Emitter(interfaceWriter, proxyWriter);
-e.emit(samples, argv._[1]);
+e.emit(samples, rootName);
