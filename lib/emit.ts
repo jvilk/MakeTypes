@@ -75,6 +75,9 @@ export default class Emitter {
   }
   public emit(root: any, rootName: string): void {
     let rootShape = d2s(this, root);
+    this.emitShape(rootShape, rootName)
+  }
+  public emitShape(rootShape: Shape, rootName: string): void {
     if (rootShape.type === BaseShape.COLLECTION) {
       rootShape = rootShape.baseShape;
     }
