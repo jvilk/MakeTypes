@@ -1,4 +1,4 @@
-import {default as Emitter, emitProxyTypeCheck} from './emit';
+import { default as Emitter, emitProxyTypeCheck } from './emit';
 
 export const enum BaseShape {
   BOTTOM,
@@ -17,6 +17,8 @@ export const enum ContextType {
   ENTITY,
   FIELD
 }
+
+const INVALID_IDENTIFIER_REGEX = /^\d|[^0-9a-zA-Z$_]/g;
 
 function pascalCase(n: string): string {
   return n.split("_").map((s) => (s[0] ? s[0].toUpperCase() : "") + s.slice(1)).join("");
@@ -395,7 +397,7 @@ export class CRecordShape {
     const w = e.interfaces;
     w.write(`export interface ${this.getName(e)} {`).endl();
     this.forEachField((t, name) => {
-      w.tab(1).write(name);
+      w.tab(1).write(this.sanitizeKeyName(name));
       if (t.nullable) {
         w.write("?");
       }
@@ -409,7 +411,7 @@ export class CRecordShape {
     const w = e.proxies;
     w.writeln(`export class ${this.getProxyClass(e)} {`);
     this.forEachField((t, name) => {
-      w.tab(1).writeln(`public readonly ${name}: ${t.getProxyType(e)};`);
+      w.tab(1).writeln(`public readonly ${this.sanitizeKeyName(name)}: ${t.getProxyType(e)};`);
     });
     w.tab(1).writeln(`public static Parse(d: string): ${this.getProxyType(e)} {`);
     w.tab(2).writeln(`return ${this.getProxyClass(e)}.Create(JSON.parse(d));`);
@@ -437,14 +439,14 @@ export class CRecordShape {
     // At this point, we know we have a non-null object.
     // Check all fields.
     this.forEachField((t, name) => {
-      emitProxyTypeCheck(e, w, t, 2, `d.${name}`, `field + ".${name}"`);
+      emitProxyTypeCheck(e, w, t, 2, `d["${name}"]`, `field + "[\\"${name}\\"]"`);
     });
     w.tab(2).writeln(`return new ${this.getProxyClass(e)}(d);`);
     w.tab(1).writeln(`}`);
     w.tab(1).writeln(`private constructor(d: any) {`);
     // Emit an assignment for each field.
     this.forEachField((t, name) => {
-      w.tab(2).writeln(`this.${name} = d.${name};`);
+      w.tab(2).writeln(`this["${name}"] = d["${name}"];`);
     });
     w.tab(1).writeln(`}`);
     w.writeln('}');
@@ -458,8 +460,8 @@ export class CRecordShape {
     this._name = name;
   }
   public getName(e: Emitter): string {
-    if (typeof(this._name) === 'string') {
-      return this._name;
+    if (typeof (this._name) === 'string') {
+      return this.sanitizeTypeName(this._name);
     }
     // Calculate unique name.
     const nameSet = new Set<string>();
@@ -474,8 +476,22 @@ export class CRecordShape {
         return false;
       })
       .join("Or");
+    name = this.sanitizeTypeName(name);
     this._name = e.registerName(name);
     return this._name;
+  }
+  public sanitizeKeyName(name: string): string {
+    if (INVALID_IDENTIFIER_REGEX.test(name)) {
+      return `["${name}"]`;
+    }
+    return name;
+  }
+  public sanitizeTypeName(name: string): string {
+    // Accept 'a to z', '$' and '_' in any position.
+    // Accept '0 to 9' in any position except first.
+    // Replace invalid by '_'
+    const result = name.replace(INVALID_IDENTIFIER_REGEX, '_');
+    return result;
   }
 }
 
@@ -522,7 +538,7 @@ export class CCollectionShape {
     return t.type === BaseShape.COLLECTION && this.baseShape.equal(t.baseShape);
   }
   public getName(e: Emitter): string {
-    if (typeof(this._name) === 'string') {
+    if (typeof (this._name) === 'string') {
       return this._name;
     }
     const nameSet = new Set<string>();
@@ -541,6 +557,7 @@ export class CCollectionShape {
   }
 }
 
+// Combine shapes: return s1 + s2
 export function csh(e: Emitter, s1: Shape, s2: Shape): Shape {
   // csh(σ, σ) = σ
   if (s1 === s2) {
@@ -601,11 +618,12 @@ export function csh(e: Emitter, s1: Shape, s2: Shape): Shape {
   return new CAnyShape([s1, s2], s1.nullable || s2.nullable);
 }
 
+// returns the Shape for the type `d`
 export function d2s(e: Emitter, d: any): Shape {
   if (d === undefined || d === null) {
     return NullShape;
   }
-  switch (typeof(d)) {
+  switch (typeof (d)) {
     case 'number':
       return NumberShape;
     case 'string':
