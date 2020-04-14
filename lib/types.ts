@@ -18,7 +18,10 @@ export const enum ContextType {
   FIELD
 }
 
-const INVALID_IDENTIFIER_REGEX = /^\d|[^0-9a-zA-Z$_]/g;
+// This is a function because regex are stateful
+function invalidIdentifiedRegex(): RegExp {
+  return /^\d|[^0-9a-zA-Z$_]/g;
+}
 
 function pascalCase(n: string): string {
   return n.split("_").map((s) => (s[0] ? s[0].toUpperCase() : "") + s.slice(1)).join("");
@@ -481,7 +484,7 @@ export class CRecordShape {
     return this._name;
   }
   public sanitizeKeyName(name: string): string {
-    if (INVALID_IDENTIFIER_REGEX.test(name)) {
+    if (invalidIdentifiedRegex().test(name)) {
       return `["${name}"]`;
     }
     return name;
@@ -490,7 +493,7 @@ export class CRecordShape {
     // Accept 'a to z', '$' and '_' in any position.
     // Accept '0 to 9' in any position except first.
     // Replace invalid by '_'
-    const result = name.replace(INVALID_IDENTIFIER_REGEX, '_');
+    const result = name.replace(invalidIdentifiedRegex(), '_');
     return result;
   }
 }
