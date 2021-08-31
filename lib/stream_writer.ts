@@ -10,7 +10,7 @@ export default class StreamWriter extends Writer {
     this.stream = stream;
   }
   public write(s: string): this {
-    this.stream.write(new Buffer(s, 'utf8'));
+    this.stream.write(Buffer.from(s, 'utf8'));
     return this;
   }
   public close(cb: () => void): void {
