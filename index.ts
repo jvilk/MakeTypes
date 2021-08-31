@@ -5,7 +5,7 @@ import * as path from 'path';
 
 import { StreamWriter, NopWriter, Emitter } from './lib/index';
 
-const argv = yargs.usage('Usage: $0 [options] inputFile rootName\nFrom stdin, outputs interface by default.')
+const argv = yargs.usage('Usage: $0 [options] inputFile rootName\nOr from stdin, outputs interface by default. Outputs proxy with -p option')
   .alias('i', 'interface-file')
   .string('i')
   .describe('i', 'Specify output file for interfaces')
