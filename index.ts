@@ -16,15 +16,15 @@ const argv = yargs.usage('Usage: $0 [options] inputFile rootName\nOr from stdin,
   .alias('h', 'help')
   .argv;
 
+let interfaceWriter = new NopWriter();
+let proxyWriter = interfaceWriter;
+
 if (process.stdin.isTTY) {
   handleShellArguments();
 }
 else {
   handlePipedContent();
 }
-
-let interfaceWriter = new NopWriter();
-let proxyWriter = interfaceWriter;
 
 function handleShellArguments(){
   if (argv.i && argv.p && path.resolve(argv.i) === path.resolve(argv.p)) {
