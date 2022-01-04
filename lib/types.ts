@@ -1,7 +1,7 @@
 import {default as Emitter, emitProxyTypeCheck} from './emit';
 
   // Add any more invalid charachaters here 
-  const invalidChars = /[0-9-+\*\/ ]/g;
+  const invalidChars = /[0-9-+\*\/\?: ]/g;
 function safeField(field: string)
 {
   return field.match(invalidChars)
