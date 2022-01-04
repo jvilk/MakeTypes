@@ -1,5 +1,25 @@
 import {default as Emitter, emitProxyTypeCheck} from './emit';
 
+  // Add any more invalid charachaters here 
+  const invalidChars = /[0-9- ]/g;
+function safeField(field: string)
+{
+  return field.match(invalidChars)
+    ? `"${field}"`
+    : field;
+}
+
+function safeInterfaceName(name: string) {
+  return name.match(invalidChars) ? name.replace(invalidChars, "_") : name;
+}
+
+function safeObjectField(objectName: string, field: string)
+{
+  return field.match(invalidChars)
+    ? `${objectName}["${field}"]`
+    : `${objectName}.${field}`;
+}
+
 export const enum BaseShape {
   BOTTOM,
   NULL,
@@ -395,7 +415,7 @@ export class CRecordShape {
     const w = e.interfaces;
     w.write(`export interface ${this.getName(e)} {`).endl();
     this.forEachField((t, name) => {
-      w.tab(1).write(name);
+      w.tab(1).write(safeField(name));
       if (t.nullable) {
         w.write("?");
       }
@@ -409,7 +429,7 @@ export class CRecordShape {
     const w = e.proxies;
     w.writeln(`export class ${this.getProxyClass(e)} {`);
     this.forEachField((t, name) => {
-      w.tab(1).writeln(`public readonly ${name}: ${t.getProxyType(e)};`);
+      w.tab(1).writeln(`public readonly ${safeField(name)}: ${t.getProxyType(e)};`);
     });
     w.tab(1).writeln(`public static Parse(d: string): ${this.getProxyType(e)} {`);
     w.tab(2).writeln(`return ${this.getProxyClass(e)}.Create(JSON.parse(d));`);
@@ -437,14 +457,14 @@ export class CRecordShape {
     // At this point, we know we have a non-null object.
     // Check all fields.
     this.forEachField((t, name) => {
-      emitProxyTypeCheck(e, w, t, 2, `d.${name}`, `field + ".${name}"`);
+      emitProxyTypeCheck(e, w, t, 2, `${safeObjectField('d', name)}`, `field + ".${name}"`);
     });
     w.tab(2).writeln(`return new ${this.getProxyClass(e)}(d);`);
     w.tab(1).writeln(`}`);
     w.tab(1).writeln(`private constructor(d: any) {`);
     // Emit an assignment for each field.
     this.forEachField((t, name) => {
-      w.tab(2).writeln(`this.${name} = d.${name};`);
+      w.tab(2).writeln(`${safeObjectField('this',name)} = ${safeObjectField('d', name)};`);
     });
     w.tab(1).writeln(`}`);
     w.writeln('}');
@@ -474,6 +494,9 @@ export class CRecordShape {
         return false;
       })
       .join("Or");
+
+    // Replace invalid Typescript charachters
+    name = safeInterfaceName(name);
     this._name = e.registerName(name);
     return this._name;
   }
