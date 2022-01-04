@@ -4,6 +4,10 @@
     "forward-looking": true,
     "right ": true,
     "2-and-with-3-multiple-numbers and spaces": true,
+    "math+": true,
+    "math*": true,
+    "math/": true,
+    "math-": true,
     "some-object": {
         "with-yes-more": true,
         "fine": false,
