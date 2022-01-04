@@ -3,8 +3,31 @@ import {OptionalField} from './generated/OptionalField';
 import {OptionalFieldProxy} from './generated/OptionalFieldProxy';
 import {FieldNames} from './generated/FieldNames';
 import {FieldNamesProxy} from './generated/FieldNamesProxy';
+import {InvalidCharacters} from './generated/InvalidCharacters';
+import {InvalidCharactersProxy} from './generated/InvalidCharactersProxy';
 
 describe("Records", () => {
+  it("Invalid Charachters fields", () => {
+    var invalidChars: InvalidCharacters = {
+      normal: 1,
+      "2d-canvas": 2,
+      "forward-looking": 3,
+      "space ": 4,
+      "2-and-with-3-multiple-numbers and spaces": 5,
+      "plus+": 6,
+      "star*": 7,
+      "slash/": 8,
+      "minus-": 9,
+      "colon:": 11,
+      "question-mark?": 11,
+      "some-object": {
+        "with-yes-more": 12,
+        fine: 13,
+        "-more_wrong": 14
+      }
+    };
+    parseEquals<InvalidCharacters>(InvalidCharactersProxy, JSON.stringify(invalidChars), invalidChars);
+  });
   it("Optional fields", () => {
     const optfields: OptionalField[] = [{}, {
       foo: 3
