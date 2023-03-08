@@ -45,6 +45,6 @@
     "typescript": "^2.1.4"
   },
   "dependencies": {
-    "yargs": "^6.5.0"
+    "yargs": "^17.0.0"
   }
 }
